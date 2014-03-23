@@ -1,0 +1,34 @@
+var HEIGHT = 7;
+var WIDTH = 7;
+var gridTable;
+var board;
+class Board {
+    var height;
+    var width;
+    var grid;
+    function init() {
+	height = HEIGHT;
+	width = WIDTH;
+	grid = new Array(height);
+	for (int i=0; i<height; i++) {
+	    grid[i] = new Array(width);
+	    for (int j=0; j<width; j++) {
+	    }
+	}
+    }
+    function fillSquare(i, j) {
+	
+    }
+}
+$(document).ready(function() {
+	board = new Board();
+	gridTable = $('#grid');
+	fillGrid();
+    });
+    function fillGrid() {
+	for (var i=0; i<board.height; i++) {
+	    for (var j=0; j<board.width; i++) {
+		board.fillSquare(i,j);
+	    }
+	}
+    }

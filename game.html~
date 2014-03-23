@@ -1,0 +1,13 @@
+<html>
+<head>
+  
+<script type="text/javascript" src="game.js"></script>
+  <title>
+    game
+  </title>
+</head>
+<body>
+<table id="grid">
+</table>
+</body>
+</html>
