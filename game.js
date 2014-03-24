@@ -1,7 +1,7 @@
 var HEIGHT = 7;
 var WIDTH = 7;
 var INITIAL_VALUES = [2,3,5,7];
-var gridTable;
+var div;
 var board;
 var visited = [];
 function Square() {}
@@ -26,10 +26,9 @@ function Board(height,width) {
 }
 $(document).ready(function() {
 	board = new Board(HEIGHT,WIDTH);
-	gridTable = $('#grid');
+	div = $('#grid');
 	fillGrid();
 	displayGrid();
-	
     });
 function fillGrid() {
     for (var i=0; i<board.height; i++) {
@@ -40,22 +39,23 @@ function fillGrid() {
 }
 function displayGrid() {
     for (var i=0; i<board.height; i++) {
-	var row = document.createElement('tr');
-	row.setAttribute('id','row'+i);
-	gridTable.append(row);
 	for (var j=0; j<board.width; j++) {
-	    var square = document.createElement('td');
-	    square.setAttribute('class','col'+j);
-	    square.setAttribute('width','30px');
-	    row.appendChild(square);
-	    var a = document.createElement('a');
-	    a.setAttribute('id','row'+i+'col'+j);
-	    a.setAttribute('onclick','clickSquare('+i+','+j+')');
-	    var text = document.createTextNode(board.grid[i][j]);
-	    square.appendChild(a);
-	    a.appendChild(text);
+	    createSquareElement(i,j,0);
 	}
     }
+}
+function createSquareElement(i,j,k) {
+    if (k == undefined) {
+	k = 0;
+    }
+    var square = document.createElement('a');
+    square.setAttribute('style','position:absolute; top:'+30*(i-k)+'px; left:'+30*j+'px; width: 30px; text-align: center;');
+    square.setAttribute('id','row'+i+'col'+j);
+    square.setAttribute('onclick','clickSquare('+i+','+j+')');
+    var text = document.createTextNode(board.grid[i][j]);
+    square.appendChild(text);
+    div.append(square);
+    
 }
 function clickSquare(x,y) {
     visited = new Array();
@@ -72,7 +72,7 @@ function clickSquare(x,y) {
 	var currInd = indexes[i];
 	board.valid[currInd[0]][currInd[1]] = false;
     }
-    board.grid[x][y] = board.grid[x][y] * indexes.length;
+    newVal = board.grid[x][y] = board.grid[x][y] * indexes.length;
     board.valid[x][y] = true;
     invalidBelow = new Array();
     for (i = board.height - 1; i >= 0; i--) {
@@ -91,6 +91,27 @@ function clickSquare(x,y) {
 	    }
 	}
     }
+    $('#row'+x+'col'+y).addClass('toReappear').animate({
+	    opacity: 0
+		}, 250, function() {
+	    $('.toReappear').empty().append(newVal);
+	    $('.toReappear').removeClass('toReappear').animate({
+	    opacity: 1
+			}, 250);
+	});
+    //squares to be removed:
+    for (i = board.height - 1; i >= 0; i--) {
+	for (var j = 0; j < board.width; j++) {
+	    if (!board.valid[i][j]) {
+		$('#row'+i+'col'+j).removeAttr('id').addClass('toBeRemoved').animate({
+			opacity: 0
+			    }, 750, function() {
+			$('.toBeRemoved').remove();
+		    });
+		
+	    }
+	}
+    }
     for (i = board.height - 1; i >= 0; i--) {
 	for (var j = 0; j < board.width; j++) {
 	    if (invalidBelow[i][j]) {
@@ -100,15 +121,33 @@ function clickSquare(x,y) {
 	    }
 	}
     }
+    //slide square down
+    for (i = board.height - 1; i >= 0; i--) {
+	for (var j = 0; j < board.width; j++) {
+	    if (invalidBelow[i][j]) {
+		var newi = (i + invalidBelow[i][j]);
+		$('#row'+i+'col'+j).animate({
+			top: 30*newi+'px'
+			    }, 750);
+		$('#row'+i+'col'+j).attr('id','row'+newi+'col'+j);
+		$('#row'+newi+'col'+j).attr('onclick','clickSquare('+newi+','+j+');');
+	    }
+	}
+    }
     for (i = board.height - 1; i >= 0; i--) {
 	for (var j = 0; j < board.width; j++) {
 	    if (!board.valid[i][j]) {
 		board.fillSquare(i,j);
+		createSquareElement(i,j,1+invalidBelow[0][j]);
+
+		$('#row'+i+'col'+j).animate({
+			top: 30*i+'px'
+			    }, 750);
+		board.valid[i][j] = true;
 	    }
 	}
     }
-    gridTable.empty();
-    displayGrid();
+    
 }
 function visit(i,j,value) {
     var res = [];
