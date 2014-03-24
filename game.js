@@ -68,11 +68,12 @@ function createSquareElement(i,j,k) {
 function mouseout() {
     if (longPressTimeout != undefined){
 	clearTimeout(longPressTimeout);
+	longPressTimeout = undefined;
     }
 }
 function mousedown(i,j) {
     if (longPressTimeout == undefined) {
-	longPressTimeout = setTimeout(function(){squareAction(i,j); longPressTimeout = undefined;},1500);
+	longPressTimeout = setTimeout(function(){squareAction(i,j);},750);
     }
 }
 function squareActionDone() {
@@ -86,6 +87,10 @@ function squareActionDone() {
 		fontSize: '100%'}, 200);
 	longPress = undefined;
     }
+    if (longPressTimeout != undefined){
+	clearTimeout(longPressTimeout);
+	longPressTimeout = undefined;
+    }
 }
 function squareAction(i,j) {
     if (longPress != undefined) {
@@ -93,6 +98,7 @@ function squareAction(i,j) {
     }
     if (longPressTimeout != undefined){
 	clearTimeout(longPressTimeout);
+	longPressTimeout = undefined;
     }
     longPress = [i,j];
     $('#row'+i+'col'+j).append('<div class="circle" id="mainCircle" style="width: 1px; height: 1px; position: absolute; left: 15px; top: 15px; background-color: rgb(255,200,0);">');
@@ -145,7 +151,7 @@ function clickSquare(x,y) {
     $('#row'+x+'col'+y).addClass('toReappear').animate({
 	    opacity: 0
 		}, 250, function() {
-	    $('.toReappear').empty().append(newVal);
+	    $('.toReappear>.text').empty().append(newVal);
 	    $('.toReappear').removeClass('toReappear').css('background-color', 'rgb('+(newVal*68)%255+",128,"+(newVal*193)%255+")").animate({
 	    opacity: 1
 			}, 250);
